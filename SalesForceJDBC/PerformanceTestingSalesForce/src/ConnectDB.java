@@ -1,45 +1,17 @@
 import java.sql.*;
-//import org.apache.ibatis.jdbc.ScriptRunner;
-// https://www.geeksforgeeks.org/establishing-jdbc-connection-in-java/ (Resources to understand JDBC Connectivity)
+
 import java.util.Properties;
-public class ConnectDB {
+
+abstract class ConnectDB {
  
-	protected static final String SalesForceURL = "jdbc:salesforce:";
+	protected static String DataSourceURL;  //= "";
 
 	protected static Connection conn = null;
     protected static Statement stmt = null;
-    
-    protected Properties prop = new Properties();
-    
-    public ConnectDB()
-    {
-    try {
-    	prop.setProperty("User" , "support@nsoftware.com");
-        prop.setProperty("Password","!rssbus");
-        prop.setProperty("Security Token","zITU0ThaYMAFudbDvl4Vj1gH");
-        Class.forName("cdata.jdbc.salesforce.SalesforceDriver");
-        }
-    catch (Exception exp) {
-        System.out.println("Sorry!!! Unable to load SalesForce Driver");
-        exp.printStackTrace();
-    }
-    }
+     
 
-   public void connect(){
-	
-	
-    try {
-        conn = DriverManager.getConnection(SalesForceURL, prop);
-        System.out.println("Connection Successful to SalesForce API !!!!!!!!!!!!!!!!!!");
-    }
-    catch (Exception e) {
-        System.out.println(e);
-    }
-    
-    }
-
-    // Ask any OODD Student for the difference between a Query and a Command.
-    // ResultSet in the Java abstraction of records received from the Database.
+    abstract public void connect(); 
+   
     public ResultSet execQuery(String cmd) throws SQLException {
 	     if (conn == null)
 	     {
