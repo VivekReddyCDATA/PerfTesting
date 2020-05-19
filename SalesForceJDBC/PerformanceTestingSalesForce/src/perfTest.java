@@ -3,6 +3,7 @@ import java.io.*;
 import java.util.*; 
 import java.text.MessageFormat;
 import java.util.Random; 
+import java.util.concurrent.TimeUnit;
 
 public class perfTest {
 	
@@ -101,7 +102,6 @@ public class perfTest {
 	
 	public void statistics(String cmd, String driverType, boolean debug) throws SQLException
 	{	
-		int numRows = 0;
 		ArrayList<Long> ldiff = new ArrayList<Long>();
 		for (int iter = 0; iter < TestItr; iter++) {
 	        java.util.Date dStart = new java.util.Date();   //get start time
@@ -116,57 +116,80 @@ public class perfTest {
 			      }
 			    }
 			}
-			numRows = rs.getRow();
 			java.util.Date dEnd = new java.util.Date();  //get end time
 			ldiff.add(dEnd.getTime()-dStart.getTime());
 		}
 		Long avg = Long.valueOf(0);
 	    for (int i = 0; i<TestItr; i++) { avg += ldiff.get(i);}
 	    avg = avg / (TestItr);
-	    System.out.print(MessageFormat.format("Query Time (ms): {0}, Driver Type: {1} Num Rows {2} \n .......Query \"{3}\"\n", avg, driverType, numRows, cmd)); 	
+	    System.out.print(MessageFormat.format("Query Time (ms): {0}, Driver Type: {1} \n .......Query \"{2}\"\n", avg, driverType, cmd)); 	
 	}
-
-	public static void main(String[] args) throws Exception
-    {	
-		boolean debug = false;
+	
+	
+	public void PerformExp(String driverType, boolean debug) {
 		
-		// --------------------------------------  CDATA Section -----------------------------------------
-		String driverType = "CData";
-		SQLObj = new CDATADriver();
-		
-        perfTest obj = new perfTest(driverType);   
         try {
         	
-//        	obj.DBStats();
+        	// obj.DBStats();
+    
+        	// --------------------- Lead Table -------------------------
         	
-//        	obj.BatchInsert(2500);
-//        	// To Not to Record Outlier
-        	obj.trailRun("SELECT COUNT(*) as MyCustomObject__c FROM MyCustomObject__c");
-//        	
-//        	// Tests
-//        	obj.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
-//        	obj.statistics("SELECT Website FROM Lead", driverType, debug);
-//        	obj.statistics("SELECT Street, City, State, Latitude , Longitude FROM Lead", driverType, debug);
+        	// To Not to Record Outlier
+//        	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM Lead");
+     
+//        	this.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
+//        	this.statistics("SELECT Website FROM Lead", driverType, debug);
+//        	this.statistics("SELECT Street, City, State, Latitude , Longitude FROM Lead", driverType, debug);
+        	
+        	
+        	// --------------------  Custom Table ------------------------------------
+//        	this.BatchInsert(2500);
+        	
+        	// To Not to Record Outlier
+        	this.trailRun("SELECT COUNT(*) FROM MyCustomObject__c");
+        	
+        	// Tests
+        	this.statistics("SELECT Name, CustomString__c, " 
+        			+ "CustomString2__c, CustomString3__c, CustomDateTime1__c, " 
+        			+ "CustomDateTime2__c, CustomDouble1__c FROM MyCustomObject__c", driverType, debug);  	
         }
+        
         catch (Exception e) {
-            System.out.println("DB: Unable to close the statement" + e);
-        }
-        SQLObj.terminate();
+            System.out.println("DB: Unable to close the statement \n" + e);
+        }   
+	}
+	
+	public static void main(String[] args) throws Exception
+    {	
+		String driverType;
+		perfTest obj;
+		
+		boolean debug = false;
+		
+		System.out.println("------------------ Progress Section ----------------- \n");
         
-     // --------------------------------------  Competitor 1 -----------------------------------------
+        driverType = "Progress";
+        SQLObj = new ProgressDriver();
+		obj = new perfTest(driverType); 
+		obj.PerformExp(driverType, debug);
+		SQLObj.terminate();
         
+		TimeUnit.SECONDS.sleep(10);
+		
+		System.out.println("------------------ CDATA Section ----------------- \n");
+		driverType = "CData";
+		SQLObj = new CDATADriver();
+		obj = new perfTest(driverType); 
+		obj.PerformExp(driverType, debug);
+		SQLObj.terminate();
         
-        
-        
-     // --------------------------------------  Competitor 2 -----------------------------------------
+//		TimeUnit.SECONDS.sleep(10);
+			
     }
 }
 
 class CDATADriver extends ConnectDB {
-	
-	private String user = "vivekk@cdata101.dev";
-	private String pwd = "!rssbus2020";
-	private String Token = "TTcwRPyZ2piuMnI8wYQXzn5lJ";
+
 	private String URL = "jdbc:cdata:salesforce:";
 	
 	public void connect() {
@@ -188,6 +211,30 @@ class CDATADriver extends ConnectDB {
 	    
 	    try {
 	        conn = DriverManager.getConnection(DataSourceURL, prop);
+	        System.out.println("Connection Successful to SalesForce API !!!!!!!!!!!!!!!!!!");
+	    }
+	    catch (Exception e) {
+	        System.out.println(e);
+	    }
+	}
+}
+
+class ProgressDriver extends ConnectDB {
+	
+	public void connect() {
+		
+	    try {
+	        Class.forName("com.ddtek.jdbc.sforce.SForceDriver");
+	    }
+	    catch (Exception exp) {
+	        System.out.println("Sorry!!! Unable to load SalesForce Driver");
+	        exp.printStackTrace();
+	    }
+	    
+	    try {
+	        conn = DriverManager.getConnection(MessageFormat.format("jdbc:datadirect:sforce://login.salesforce.com;User={0};"
+	        		   +"Password={1};SecurityToken={2}", user, pwd, Token));
+	        
 	        System.out.println("Connection Successful to SalesForce API !!!!!!!!!!!!!!!!!!");
 	    }
 	    catch (Exception e) {

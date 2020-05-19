@@ -10,7 +10,10 @@ abstract class ConnectDB {
     protected static Statement stmt = null;
      
     abstract public void connect(); 
-   
+    
+    protected String user = "vivekk@cdata101.dev";
+    protected String pwd = "!rssbus2020";
+    protected String Token = "TTcwRPyZ2piuMnI8wYQXzn5lJ";
     
     public DatabaseMetaData getMetaData() throws SQLException{
     	if (conn == null) {
