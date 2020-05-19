@@ -19,11 +19,33 @@ public class perfTest {
 	   	
 	}
 	
+	
+	public void DBStats() throws SQLException{
+		DatabaseMetaData table_meta = SQLObj.getMetaData();
+		String table[]={"TABLE"};  
+		ResultSet rs = table_meta.getTables(null, null, "%", table);  
+		String Query = "SELECT COUNT(*) as {0} FROM {0}";
+		ArrayList<String> tables =  new ArrayList<String>();
+		while(rs.next()){
+			tables.add(rs.getString("TABLE_NAME"));  
+		}
+		for (String t_name : tables) {
+			  if (!t_name.matches(".*[| __Tag | __History | __Share | __x]")) {
+				  try {
+					  GenuineQuery(MessageFormat.format(Query, t_name));  
+				  }
+				  catch (SQLException e) {
+					  System.out.println("Error: " + t_name);
+				  }	  
+			  }	
+		}
+	}
+	
 	public void GenuineQuery(String cmd) throws SQLException{
 		ResultSet rs = SQLObj.execQuery(cmd);
 		while(rs.next()) {
 		    for(int i=1;i<=rs.getMetaData().getColumnCount();i++) {
-		    	  System.out.println(rs.getMetaData().getColumnName(i) +"="+rs.getString(i)); 
+		    	  System.out.println(rs.getMetaData().getColumnName(i) +" = "+rs.getString(i)); 
 		    }
 		}
 	}
@@ -73,22 +95,18 @@ public class perfTest {
 		
         perfTest obj = new perfTest(driverType);   
         try {
-        	String Query =	"select t.name TableName, i.rows Records " 
-    	            + "from sys objects t, sys indexes i "
-    	            + "where t.xtype = 'U' and i.id = t.id and i.indid in (0,1) "
-    	            + "order by TableName";
-        	obj.GenuineQuery(Query);
         	
-        	// To Not Record Outlier
-        	obj.trailRun("SELECT COUNT(*) FROM LeadFeed");
-        	
-        	// Tests
-        	obj.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
-        	obj.statistics("SELECT Website FROM Lead", driverType, debug);
-        	obj.statistics("SELECT Street, City, State, Latitude , Longitude FROM Lead", driverType, debug);
+        	obj.DBStats();
+//        	// To Not to Record Outlier
+//        	obj.trailRun("SELECT COUNT(*) as LeadFeed FROM LeadFeed");
+//        	
+//        	// Tests
+//        	obj.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
+//        	obj.statistics("SELECT Website FROM Lead", driverType, debug);
+//        	obj.statistics("SELECT Street, City, State, Latitude , Longitude FROM Lead", driverType, debug);
         }
         catch (Exception e) {
-            System.out.println("DB: Unable to close the statement");
+            System.out.println("DB: Unable to close the statement" + e);
         }
         SQLObj.terminate();
         

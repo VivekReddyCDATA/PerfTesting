@@ -9,9 +9,17 @@ abstract class ConnectDB {
 	protected static Connection conn = null;
     protected static Statement stmt = null;
      
-
     abstract public void connect(); 
    
+    
+    public DatabaseMetaData getMetaData() throws SQLException{
+    	if (conn == null) {
+    		throw new SQLException("Please open a connection to extract MetaData");
+    	}
+    	DatabaseMetaData table_meta = conn.getMetaData();
+    	return table_meta;
+    }
+    
     public ResultSet execQuery(String cmd) throws SQLException {
 	     if (conn == null)
 	     {
