@@ -135,23 +135,28 @@ public class perfTest {
         	// --------------------- Lead Table -------------------------
         	
         	// To Not to Record Outlier
-//        	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM Lead");
+        	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM Lead");
      
-//        	this.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
-//        	this.statistics("SELECT Website FROM Lead", driverType, debug);
-//        	this.statistics("SELECT Street, City, State, Latitude , Longitude FROM Lead", driverType, debug);
+        	this.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
         	
+        	this.statistics("SELECT Website FROM Lead", driverType, debug);
+        	
+        	this.statistics("SELECT Street, City, State, Latitude , Longitude FROM Lead", driverType, debug);
+        	
+        	this.statistics("SELECT Website, MobilePhone, Description, LastViewedDate, " 
+        					+ "Street, City, State, Latitude, Longitude, LastReferencedDate " 
+        					+ "FROM Lead", driverType, debug);
         	
         	// --------------------  Custom Table ------------------------------------
 //        	this.BatchInsert(2500);
         	
-        	// To Not to Record Outlier
-        	this.trailRun("SELECT COUNT(*) FROM MyCustomObject__c");
-        	
-        	// Tests
-        	this.statistics("SELECT Name, CustomString__c, " 
-        			+ "CustomString2__c, CustomString3__c, CustomDateTime1__c, " 
-        			+ "CustomDateTime2__c, CustomDouble1__c FROM MyCustomObject__c", driverType, debug);  	
+//        	// To Not to Record Outlier
+//        	this.trailRun("SELECT COUNT(*) FROM MyCustomObject__c");
+//        	
+//        	// Tests
+//        	this.statistics("SELECT Name, CustomString__c, " 
+//        			+ "CustomString2__c, CustomString3__c, CustomDateTime1__c, " 
+//        			+ "CustomDateTime2__c, CustomDouble1__c FROM MyCustomObject__c", driverType, debug);  	
         }
         
         catch (Exception e) {
@@ -166,25 +171,22 @@ public class perfTest {
 		
 		boolean debug = false;
 		
-		System.out.println("------------------ Progress Section ----------------- \n");
-        
-        driverType = "Progress";
-        SQLObj = new ProgressDriver();
-		obj = new perfTest(driverType); 
-		obj.PerformExp(driverType, debug);
-		SQLObj.terminate();
-        
-		TimeUnit.SECONDS.sleep(10);
-		
-		System.out.println("------------------ CDATA Section ----------------- \n");
+		System.out.println("\n ------------------ CDATA Section -----------------");
 		driverType = "CData";
 		SQLObj = new CDATADriver();
 		obj = new perfTest(driverType); 
 		obj.PerformExp(driverType, debug);
 		SQLObj.terminate();
+		
+		TimeUnit.SECONDS.sleep(20);
+		
+		System.out.println("\n ------------------ Progress Section -----------------");
         
-//		TimeUnit.SECONDS.sleep(10);
-			
+        driverType = "Progress";
+        SQLObj = new ProgressDriver();
+		obj = new perfTest(driverType); 
+		obj.PerformExp(driverType, debug);
+		SQLObj.terminate();	
     }
 }
 

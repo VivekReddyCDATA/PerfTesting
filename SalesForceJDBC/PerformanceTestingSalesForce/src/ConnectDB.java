@@ -11,9 +11,9 @@ abstract class ConnectDB {
      
     abstract public void connect(); 
     
-    protected String user = "vivekk@cdata101.dev";
-    protected String pwd = "!rssbus2020";
-    protected String Token = "TTcwRPyZ2piuMnI8wYQXzn5lJ";
+    protected String user = "support@nsoftware.com"; // "vivekk@cdata101.dev";
+    protected String pwd = "!rssbus"; //!rssbus2020";
+    protected String Token = "zITU0ThaYMAFudbDvl4Vj1gH"; // "TTcwRPyZ2piuMnI8wYQXzn5lJ";
     
     public DatabaseMetaData getMetaData() throws SQLException{
     	if (conn == null) {
