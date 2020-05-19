@@ -2,6 +2,7 @@ import java.sql.*;
 import java.io.*;
 import java.util.*; 
 import java.text.MessageFormat;
+import java.util.Random; 
 
 public class perfTest {
 	
@@ -19,7 +20,6 @@ public class perfTest {
 	   	
 	}
 	
-	
 	public void DBStats() throws SQLException{
 		DatabaseMetaData table_meta = SQLObj.getMetaData();
 		String table[]={"TABLE"};  
@@ -29,6 +29,7 @@ public class perfTest {
 		while(rs.next()){
 			tables.add(rs.getString("TABLE_NAME"));  
 		}
+		
 		for (String t_name : tables) {
 			  if (!t_name.matches(".*[| __Tag | __History | __Share | __x]")) {
 				  try {
@@ -39,6 +40,46 @@ public class perfTest {
 				  }	  
 			  }	
 		}
+		
+//		rs = table_meta.getColumns(null, null, "MyCustomObject__c", null);
+//        System.out.println("MyCustomObject__c");
+//        while (rs.next()) {
+//            System.out.println(rs.getString("COLUMN_NAME") + " "
+//                    + rs.getString("TYPE_NAME") + " "
+//                    + rs.getString("COLUMN_SIZE"));
+//        }
+//        System.out.println("\n");
+	}
+	
+	public void BatchInsert(int numRecords) throws SQLException{
+		
+		Random rand = new Random();
+		
+		String Query =  "INSERT INTO MyCustomObject__c (Name, CustomString__c, "
+						+ "CustomString2__c, CustomString3__c, CustomDateTime1__c, " 
+						+ "CustomDateTime2__c, CustomDouble1__c)"
+						+ " VALUES (?, ?, ?, ?, ?, ?, ?) ";
+		PreparedStatement pstmt = SQLObj.getPreparedStatement(Query);
+		
+		for (int k = 0; k < numRecords; k++) {
+			String i = String.valueOf(k);
+			pstmt.setString(1, "Test Object 1 : " + i );
+			pstmt.setString(2, "Test String 'Just Some Random Stuffffff' 1 : " + i );
+			pstmt.setString(3, "Test String 'Just Similar Ramdom Stufffffffff' 2 : " + i );
+			pstmt.setString(4, "Test String 'HIiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" 
+								+ "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii' 3 : " + i );
+			
+			pstmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+			pstmt.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+			pstmt.setDouble(7, rand.nextDouble());
+			pstmt.addBatch();
+		}
+		
+		
+		int[] r = pstmt.executeBatch();
+		for(int j: r)
+		  System.out.println(j);
+			
 	}
 	
 	public void GenuineQuery(String cmd) throws SQLException{
@@ -96,9 +137,11 @@ public class perfTest {
         perfTest obj = new perfTest(driverType);   
         try {
         	
-        	obj.DBStats();
+//        	obj.DBStats();
+        	
+//        	obj.BatchInsert(2500);
 //        	// To Not to Record Outlier
-//        	obj.trailRun("SELECT COUNT(*) as LeadFeed FROM LeadFeed");
+        	obj.trailRun("SELECT COUNT(*) as MyCustomObject__c FROM MyCustomObject__c");
 //        	
 //        	// Tests
 //        	obj.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
@@ -121,9 +164,9 @@ public class perfTest {
 
 class CDATADriver extends ConnectDB {
 	
-	private String user = "support@nsoftware.com";
-	private String pwd = "!rssbus";
-	private String Token = "zITU0ThaYMAFudbDvl4Vj1gH";
+	private String user = "vivekk@cdata101.dev";
+	private String pwd = "!rssbus2020";
+	private String Token = "TTcwRPyZ2piuMnI8wYQXzn5lJ";
 	private String URL = "jdbc:cdata:salesforce:";
 	
 	public void connect() {

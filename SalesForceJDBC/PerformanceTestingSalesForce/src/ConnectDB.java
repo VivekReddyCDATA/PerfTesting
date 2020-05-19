@@ -20,6 +20,11 @@ abstract class ConnectDB {
     	return table_meta;
     }
     
+    public PreparedStatement getPreparedStatement(String Query) throws SQLException {
+    	PreparedStatement pstmt = conn.prepareStatement(Query,Statement.RETURN_GENERATED_KEYS);
+    	return pstmt;
+    }
+    
     public ResultSet execQuery(String cmd) throws SQLException {
 	     if (conn == null)
 	     {
