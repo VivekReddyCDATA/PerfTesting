@@ -1,3 +1,4 @@
+
 import java.sql.*;
 import java.io.*;
 import java.util.*; 
@@ -5,12 +6,13 @@ import java.text.MessageFormat;
 import java.util.Random; 
 import java.util.concurrent.TimeUnit;
 
-public class perfTest {
+
+public class PerfTestingCassandra {
 	
 	public int TestItr = 5;
 	public static ConnectDB SQLObj;
 	
-	public perfTest(String driverType)
+	public PerfTestingCassandra(String driverType)
 	{		
 		long ldiff; 
 		java.util.Date dStart = new java.util.Date();  //get start time
@@ -25,31 +27,32 @@ public class perfTest {
 		DatabaseMetaData table_meta = SQLObj.getMetaData();
 		String table[]={"TABLE"};  
 		ResultSet rs = table_meta.getTables(null, null, "%", table);  
-		String Query = "SELECT COUNT(*) as {0} FROM {0}";
+		String Query = "SELECT COUNT(*) FROM {0}";
 		ArrayList<String> tables =  new ArrayList<String>();
 		while(rs.next()){
 			tables.add(rs.getString("TABLE_NAME"));  
 		}
 		
 		for (String t_name : tables) {
-			  if (!t_name.matches(".*[| __Tag | __History | __Share | __x]")) {
-				  try {
-					  GenuineQuery(MessageFormat.format(Query, t_name));  
-				  }
-				  catch (SQLException e) {
-					  System.out.println("Error: " + t_name);
-				  }	  
-			  }	
+//			  if (!t_name.matches(".*[| __Tag | __History | __Share | __x]")) {
+//				  try {
+//					  GenuineQuery(MessageFormat.format(Query, t_name));  
+//				  }
+//				  catch (SQLException e) {
+//					  e.printStackTrace();
+//				  }	  
+//			  }	
+			System.out.println(t_name);
 		}
 		
 //		rs = table_meta.getColumns(null, null, "MyCustomObject__c", null);
-//        System.out.println("MyCustomObject__c");
-//        while (rs.next()) {
+//      System.out.println("MyCustomObject__c");
+//      while (rs.next()) {
 //            System.out.println(rs.getString("COLUMN_NAME") + " "
 //                    + rs.getString("TYPE_NAME") + " "
 //                    + rs.getString("COLUMN_SIZE"));
-//        }
-//        System.out.println("\n");
+//      }
+//      System.out.println("\n");
 	}
 	
 	public void BatchInsert(int numRecords) throws SQLException{
@@ -167,82 +170,49 @@ public class perfTest {
 	public static void main(String[] args) throws Exception
     {	
 		String driverType;
-		perfTest obj;
+		PerfTestingCassandra obj;
 		
 		boolean debug = false;
 		
 		System.out.println("\n ------------------ CDATA Section -----------------");
-		driverType = "CData";
-		SQLObj = new CDATADriver();
-		obj = new perfTest(driverType); 
-		obj.PerformExp(driverType, debug);
-		SQLObj.terminate();
-		
-		TimeUnit.SECONDS.sleep(20);
-		
-		System.out.println("\n ------------------ Progress Section -----------------");
-        
-        driverType = "Progress";
-        SQLObj = new ProgressDriver();
-		obj = new perfTest(driverType); 
-		obj.PerformExp(driverType, debug);
+		driverType = "Cassandra";
+        SQLObj = new CDATACassandraDriver();
+		obj = new PerfTestingCassandra(driverType); 
+		obj.DBStats();
+//		obj.PerformExp(driverType, debug);
 		SQLObj.terminate();	
-
-		
+//		
+//		TimeUnit.SECONDS.sleep(20);
+//		
+		System.out.println("\n ------------------ Progress Section -----------------");
+//        
+//      driverType = "Progress";
+//      SQLObj = new ProgressDriver();
+//		obj = new perfTest(driverType); 
+//		obj.PerformExp(driverType, debug);
+//		SQLObj.terminate();		
     }
 }
 
-class CDATADriver extends ConnectDB {
-
-	private String URL = "jdbc:cdata:salesforce:";
+class CDATACassandraDriver extends ConnectDB{
 	
 	public void connect() {
-		
-		DataSourceURL = URL;
-		
-		Properties prop = new Properties();
-		
-	    try {
-	    	prop.setProperty("User" , user);
-	        prop.setProperty("Password", pwd);
-	        prop.setProperty("Security Token", Token);
-	        Class.forName("cdata.jdbc.salesforce.SalesforceDriver");
+		try {
+	        Class.forName("cdata.jdbc.cassandra.CassandraDriver");
 	    }
 	    catch (Exception exp) {
-	        System.out.println("Sorry!!! Unable to load SalesForce Driver");
+	        System.out.println("Sorry!!! Unable to load Cassandra Driver");
 	        exp.printStackTrace();
 	    }
 	    
 	    try {
-	        conn = DriverManager.getConnection(DataSourceURL, prop);
-	        System.out.println("Connection Successful to SalesForce API !!!!!!!!!!!!!!!!!!");
-	    }
-	    catch (Exception e) {
-	        System.out.println(e);
-	    }
-	}
-}
-
-class ProgressDriver extends ConnectDB {
-	
-	public void connect() {
-		
-	    try {
-	        Class.forName("com.ddtek.jdbc.sforce.SForceDriver");
-	    }
-	    catch (Exception exp) {
-	        System.out.println("Sorry!!! Unable to load SalesForce Driver");
-	        exp.printStackTrace();
-	    }
-	    
-	    try {
-	        conn = DriverManager.getConnection(MessageFormat.format("jdbc:datadirect:sforce://login.salesforce.com;User={0};"
-	        		   +"Password={1};SecurityToken={2}", user, pwd, Token));
+	        conn = DriverManager.getConnection("jdbc:cassandra:server=localhost;port=9042;");
 	        
 	        System.out.println("Connection Successful to SalesForce API !!!!!!!!!!!!!!!!!!");
 	    }
 	    catch (Exception e) {
-	        System.out.println(e);
+	        e.printStackTrace();
 	    }
 	}
+	
 }
