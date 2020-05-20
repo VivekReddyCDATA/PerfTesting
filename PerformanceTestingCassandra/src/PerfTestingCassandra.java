@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PerfTestingCassandra {
 	
-	public int TestItr = 5;
+	public int TestItr = 2;
 	public static ConnectDB SQLObj;
 	
 	public PerfTestingCassandra(String driverType)
@@ -26,33 +26,30 @@ public class PerfTestingCassandra {
 	public void DBStats() throws SQLException{
 		DatabaseMetaData table_meta = SQLObj.getMetaData();
 		String table[]={"TABLE"};  
-		ResultSet rs = table_meta.getTables(null, null, "%", table);  
-		String Query = "SELECT COUNT(*) FROM {0}";
+		ResultSet rs = table_meta.getTables(null, null, "%", null);  
+		String Query = "SELECT COUNT(*) as {2} FROM {0}.{1}.{2}";
 		ArrayList<String> tables =  new ArrayList<String>();
 		while(rs.next()){
-			tables.add(rs.getString("TABLE_NAME"));  
+			String TC = rs.getString("TABLE_CAT");
+			String TS = rs.getString("TABLE_SCHEM");
+			String TN = rs.getString("TABLE_NAME");
+			try {
+				 GenuineQuery(MessageFormat.format(Query, TC, TS, TN));
+			}
+			catch (SQLException e) {
+				 System.out.println("Error: " + TC +"."+TS+"."+ TN);
+			}	  
+		System.out.println("Table Name: " + TC+"."+TS+"."+ TN);
 		}
-		
-		for (String t_name : tables) {
-//			  if (!t_name.matches(".*[| __Tag | __History | __Share | __x]")) {
-//				  try {
-//					  GenuineQuery(MessageFormat.format(Query, t_name));  
-//				  }
-//				  catch (SQLException e) {
-//					  e.printStackTrace();
-//				  }	  
-//			  }	
-			System.out.println(t_name);
-		}
-		
-//		rs = table_meta.getColumns(null, null, "MyCustomObject__c", null);
-//      System.out.println("MyCustomObject__c");
-//      while (rs.next()) {
-//            System.out.println(rs.getString("COLUMN_NAME") + " "
-//                    + rs.getString("TYPE_NAME") + " "
-//                    + rs.getString("COLUMN_SIZE"));
-//      }
-//      System.out.println("\n");
+
+		ResultSet rs_new = table_meta.getColumns("CData", "test", "nyc_yellow_taxi_trip", null);
+	
+	    while (rs_new.next()) {
+	          System.out.println(rs_new.getString("COLUMN_NAME") + " "
+	                    + rs_new.getString("TYPE_NAME") + " "
+	                    + rs_new.getString("COLUMN_SIZE"));
+	    }
+	    System.out.println("\n");
 	}
 	
 	public void BatchInsert(int numRecords) throws SQLException{
@@ -133,33 +130,34 @@ public class PerfTestingCassandra {
 		
         try {
         	
-        	// obj.DBStats();
+//        	 To Not to Record outlier
+        	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM [Cdata].[test].[utmfileanalyze_details]");
     
-        	// --------------------- Lead Table -------------------------
+        	// --------------------- restaurants -------------------------
         	
-        	// To Not to Record Outlier
-        	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM Lead");
-     
-        	this.statistics("SELECT LastViewedDate FROM Lead", driverType, debug);
-        	
-        	this.statistics("SELECT Website FROM Lead", driverType, debug);
-        	
-        	this.statistics("SELECT Street, City, State, Latitude , Longitude FROM Lead", driverType, debug);
-        	
-        	this.statistics("SELECT Website, MobilePhone, Description, LastViewedDate, " 
-        					+ "Street, City, State, Latitude, Longitude, LastReferencedDate " 
-        					+ "FROM Lead", driverType, debug);
-        	
-        	// --------------------  Custom Table ------------------------------------
-//        	this.BatchInsert(2500);
-        	
-//        	// To Not to Record Outlier
-//        	this.trailRun("SELECT COUNT(*) FROM MyCustomObject__c");
+//        	this.statistics("SELECT address, cuisine, grades FROM [Cdata].[test].[restaurants]", driverType, debug);
 //        	
-//        	// Tests
-//        	this.statistics("SELECT Name, CustomString__c, " 
-//        			+ "CustomString2__c, CustomString3__c, CustomDateTime1__c, " 
-//        			+ "CustomDateTime2__c, CustomDouble1__c FROM MyCustomObject__c", driverType, debug);  	
+//        	this.statistics("SELECT address, cuisine, borough, grades, name, restaurant_id"
+//        					+ " FROM [Cdata].[test].[restaurants]", driverType, debug);
+        	
+        	// --------------------  Sample Table ------------------------------------
+        	
+     
+//        	this.statistics("SELECT address, food FROM [Cdata].[test].[sampletable]", driverType, debug);
+//        	
+//        	this.statistics("SELECT address, firstname, food, lastname, id, "
+//        					+ " FROM [Cdata].[test].[sampletable]", driverType, debug);
+        	
+        	// --------------------- Cdata.test.utmfileanalyze_details --------------------
+        	
+        	this.statistics("SELECT create_time FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+        	
+        	this.statistics("SELECT sha256 FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+        	
+        	this.statistics("SELECT create_time, status, file_size, fromip_int, sha256 "
+        					+ " FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+        	
+        
         }
         
         catch (Exception e) {
@@ -179,12 +177,13 @@ public class PerfTestingCassandra {
         SQLObj = new CDATACassandraDriver();
 		obj = new PerfTestingCassandra(driverType); 
 		obj.DBStats();
+//		SQLObj.execCommand(Query);
 //		obj.PerformExp(driverType, debug);
 		SQLObj.terminate();	
 //		
 //		TimeUnit.SECONDS.sleep(20);
 //		
-		System.out.println("\n ------------------ Progress Section -----------------");
+//		System.out.println("\n ------------------ Progress Section -----------------");
 //        
 //      driverType = "Progress";
 //      SQLObj = new ProgressDriver();
