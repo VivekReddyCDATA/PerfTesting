@@ -1,11 +1,9 @@
-
 import java.sql.*;
 import java.io.*;
 import java.util.*; 
 import java.text.MessageFormat;
 import java.util.Random; 
 import java.util.concurrent.TimeUnit;
-
 
 public class PerfTestingCassandra {
 	
@@ -19,8 +17,7 @@ public class PerfTestingCassandra {
 		SQLObj.connect();
 		java.util.Date dEnd = new java.util.Date();  //get end time
 	    ldiff = dEnd.getTime()-dStart.getTime();
-	    System.out.print(MessageFormat.format("Database connection time (ms): {0}, Driver Type: {1}\n", ldiff, driverType));
-	   	
+	    System.out.print(MessageFormat.format("Database connection time (ms): {0}, Driver Type: {1}\n", ldiff, driverType));	
 	}
 	
 	public void DBStats() throws SQLException{
@@ -42,7 +39,7 @@ public class PerfTestingCassandra {
 		System.out.println("Table Name: " + TC+"."+TS+"."+ TN);
 		}
 
-		ResultSet rs_new = table_meta.getColumns("CData", "test", "nyc_yellow_taxi_trip", null);
+		ResultSet rs_new = table_meta.getColumns("CData", "test", "nyc_payroll", null);
 	
 	    while (rs_new.next()) {
 	          System.out.println(rs_new.getString("COLUMN_NAME") + " "
@@ -52,7 +49,7 @@ public class PerfTestingCassandra {
 	    System.out.println("\n");
 	}
 	
-	public void BatchInsert(int numRecords) throws SQLException{
+	public void BatchInsert(int numRecords) throws SQLException {
 		
 		Random rand = new Random();
 		
@@ -176,9 +173,13 @@ public class PerfTestingCassandra {
 		driverType = "Cassandra";
         SQLObj = new CDATACassandraDriver();
 		obj = new PerfTestingCassandra(driverType); 
-		obj.DBStats();
 //		SQLObj.execCommand(Query);
 //		obj.PerformExp(driverType, debug);
+//		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
+		
+		SQLObj.execCommand("DELETE FROM Cdata.test.nyc_payroll WHERE mid_init = 'L' ");
+		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
+//		obj.DBStats();
 		SQLObj.terminate();	
 //		
 //		TimeUnit.SECONDS.sleep(20);
@@ -193,25 +194,26 @@ public class PerfTestingCassandra {
     }
 }
 
-class CDATACassandraDriver extends ConnectDB{
-	
-	public void connect() {
-		try {
-	        Class.forName("cdata.jdbc.cassandra.CassandraDriver");
-	    }
-	    catch (Exception exp) {
-	        System.out.println("Sorry!!! Unable to load Cassandra Driver");
-	        exp.printStackTrace();
-	    }
-	    
-	    try {
-	        conn = DriverManager.getConnection("jdbc:cassandra:server=localhost;port=9042;");
-	        
-	        System.out.println("Connection Successful to SalesForce API !!!!!!!!!!!!!!!!!!");
-	    }
-	    catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	}
-	
-}
+
+
+/*
+obj.GenuineQuery("CREATE TABLE Cdata.test.nyc_payroll (id UUID PRIMARY KEY, \n" + 
+		"							    fiscal_year int,\n" + 
+		"							    payroll_number int,\n" + 
+		"							    agency_name varchar,\n" + 
+		"							    last_name varchar,\n" + 
+		"							    first_name varchar,\n" + 
+		"							    mid_init varchar,\n" + 
+		"							    agency_start_date timestamp,\n" + 
+		"                               work_location_borough varchar,\n" + 
+		"							    title_description varchar,\n" + 
+		"							    leave_status_as_of_july_31  varchar,\n" + 
+		"							    base_salary  double,\n" + 
+		"							    pay_basis    varchar,\n" + 
+		"							    regular_hours  double,\n" + 
+		"							    regular_gross_paid  double,\n" + 
+		"							    ot_hours double,\n" + 
+		"							    total_ot_paid double,\n" + 
+		"							    total_other_pay double)");
+*/
+

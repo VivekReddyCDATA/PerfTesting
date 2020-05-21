@@ -3,5 +3,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/CDataCassandraDriver/lib/cdata.jdbc.cassandra.jar"/>
+	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/PerfTesting/PerformanceTestingCassandra/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/PerfTesting/PerformanceTestingCassandra/lib/jackson-annotations-2.11.0.jar"/>
+	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/PerfTesting/PerformanceTestingCassandra/lib/jackson-core-2.11.0.jar"/>
+	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/PerfTesting/PerformanceTestingCassandra/lib/jackson-databind-2.11.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
