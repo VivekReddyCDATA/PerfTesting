@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PerfTestingCassandra {
 	
-	public int TestItr = 1;
+	public int TestItr = 2;
 	public static ConnectDB SQLObj;
 	
 	public PerfTestingCassandra(String driverType)
@@ -130,33 +130,20 @@ public class PerfTestingCassandra {
 //        	 To Not to Record outlier
         	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM [Cdata].[test].[utmfileanalyze_details]");
     
-        	// --------------------- restaurants -------------------------
-        	
-//        	this.statistics("SELECT address, cuisine, grades FROM [Cdata].[test].[restaurants]", driverType, debug);
-//        	
-//        	this.statistics("SELECT address, cuisine, borough, grades, name, restaurant_id"
-//        					+ " FROM [Cdata].[test].[restaurants]", driverType, debug);
-        	
-        	// --------------------  Sample Table ------------------------------------
-        	
-     
-//        	this.statistics("SELECT address, food FROM [Cdata].[test].[sampletable]", driverType, debug);
-//        	
-//        	this.statistics("SELECT address, firstname, food, lastname, id, "
-//        					+ " FROM [Cdata].[test].[sampletable]", driverType, debug);
-        	
+     	
         	// --------------------- Cdata.test.utmfileanalyze_details --------------------
         	
-//        	this.statistics("SELECT create_time FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
-//        	
-//        	this.statistics("SELECT sha256 FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
-//        	
-//        	this.statistics("SELECT create_time, status, file_size, fromip_int, sha256 "
-//        					+ " FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
         	
-        	// --------------------- Cdata.test.utmfileanalyze_details --------------------
+        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+					+ " FROM [Cdata].[test].[nyc_payroll] LIMIT 150000", driverType, debug);
         	
-//        	this.statistics("SELECT base_salary FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
+        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+					+ " FROM [Cdata].[test].[nyc_payroll] LIMIT 50000", driverType, debug);
+        	
+        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+					+ " FROM [Cdata].[test].[nyc_payroll] LIMIT 10000", driverType, debug);
+        	
+        	this.statistics("SELECT base_salary FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
         	
         	this.statistics("SELECT agency_start_date "
         					+ " FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
