@@ -57,37 +57,51 @@ public class DataLoader {
             e.printStackTrace();
         }
 		
+		int numRecords = payrollObjects.length;
+		
+		int numRecordsPerUpdate = 100;
+		int UpdateCount = numRecords/numRecordsPerUpdate;
+		
+		assert UpdateCount*numRecordsPerUpdate == numRecords : " Non Divisible by " + 1000 + " Error"; 
+		
+		java.util.Date dStart = new java.util.Date();
 		if (payrollObjects != null) {
 			try {
 				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSS");
 				pstmt = SQLObj.getPreparedStatement(Query);
-				for (int i = 0; i < 2; i++) {
-					PayRoll obj = payrollObjects[i];
-					pstmt.setInt(1, obj.fiscal_year);
-					pstmt.setInt(2, obj.payroll_number);
-					pstmt.setString(3, obj.agency_name);
-					pstmt.setString(4, obj.last_name);
-					pstmt.setString(5, obj.first_name);
-					pstmt.setString(6, obj.mid_init);
-					pstmt.setTimestamp(7, new java.sql.Timestamp(dateFormat.parse(obj.agency_start_date).getTime()));
-					pstmt.setString(8, obj.work_location_borough);
-					pstmt.setString(9, obj.title_description);
-					pstmt.setString(10, obj.leave_status_as_of_july_31);
-					pstmt.setDouble(11, obj.base_salary);
-					pstmt.setString(12, obj.pay_basis);
-					pstmt.setDouble(13, obj.regular_hours);
-					pstmt.setDouble(14, obj.regular_gross_paid);
-					pstmt.setDouble(15, obj.ot_hours);
-					pstmt.setDouble(16, obj.total_ot_paid);
-					pstmt.setDouble(17, obj.total_other_pay);
-					pstmt.setString(18,  UUID.randomUUID().toString());
-					pstmt.addBatch();
-				}
 				
-				int[] r = pstmt.executeBatch();
-				for(int j: r)
-				  System.out.println(j);
-			} 
+		
+				for (int j = 0; j < UpdateCount; j++) {
+					for (int k = 0; k < numRecordsPerUpdate; k++) {
+						
+						int i = j*numRecordsPerUpdate + k;
+						
+						PayRoll obj = payrollObjects[i];
+						pstmt.setInt(1, obj.fiscal_year);
+						pstmt.setInt(2, obj.payroll_number);
+						pstmt.setString(3, obj.agency_name);
+						pstmt.setString(4, obj.last_name);
+						pstmt.setString(5, obj.first_name);
+						pstmt.setString(6, obj.mid_init);
+						pstmt.setTimestamp(7, new java.sql.Timestamp(dateFormat.parse(obj.agency_start_date).getTime()));
+						pstmt.setString(8, obj.work_location_borough);
+						pstmt.setString(9, obj.title_description);
+						pstmt.setString(10, obj.leave_status_as_of_july_31);
+						pstmt.setDouble(11, obj.base_salary);
+						pstmt.setString(12, obj.pay_basis);
+						pstmt.setDouble(13, obj.regular_hours);
+						pstmt.setDouble(14, obj.regular_gross_paid);
+						pstmt.setDouble(15, obj.ot_hours);
+						pstmt.setDouble(16, obj.total_ot_paid);
+						pstmt.setDouble(17, obj.total_other_pay);
+						pstmt.setString(18,  UUID.randomUUID().toString());
+						pstmt.addBatch();
+					}
+					
+					int[] r = pstmt.executeBatch();
+					System.out.println("Batch : " + j + " Inserted");
+				}	
+			}
 			catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -95,14 +109,17 @@ public class DataLoader {
 		else {
 			System.out.println("No Data Has been Extracted from JSON File");
 		}
-		
+		java.util.Date dEnd = new java.util.Date();
+		long ldiff = dEnd.getTime()-dStart.getTime();
+		System.out.print(MessageFormat.format("Insertion Time (ms): {0} #NumRows: {1}, Driver Type: {2} \n", ldiff, numRecords, "CData"));
 	}	
 	
 	public static void main(String[] args) throws Exception
     {	
 		SQLObj = new CDATACassandraDriver();
 		DataLoader DL = new DataLoader("CData");
-		DL.DOMInsert("/home/vivekreddy/Desktop/Intern/nyc_payroll_10k.json");
+		DL.DOMInsert("/home/vivekreddy/Desktop/Intern/nyc_payroll_900k.json");
+		SQLObj.terminate();	
     }
 }
 
@@ -140,5 +157,4 @@ class PayRoll{
 		    }   
 		}
 	}
-	
 }

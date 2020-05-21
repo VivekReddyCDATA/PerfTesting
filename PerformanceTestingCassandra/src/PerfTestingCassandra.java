@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PerfTestingCassandra {
 	
-	public int TestItr = 2;
+	public int TestItr = 1;
 	public static ConnectDB SQLObj;
 	
 	public PerfTestingCassandra(String driverType)
@@ -147,14 +147,22 @@ public class PerfTestingCassandra {
         	
         	// --------------------- Cdata.test.utmfileanalyze_details --------------------
         	
-        	this.statistics("SELECT create_time FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+//        	this.statistics("SELECT create_time FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+//        	
+//        	this.statistics("SELECT sha256 FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+//        	
+//        	this.statistics("SELECT create_time, status, file_size, fromip_int, sha256 "
+//        					+ " FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
         	
-        	this.statistics("SELECT sha256 FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+        	// --------------------- Cdata.test.utmfileanalyze_details --------------------
         	
-        	this.statistics("SELECT create_time, status, file_size, fromip_int, sha256 "
-        					+ " FROM [Cdata].[test].[utmfileanalyze_details]", driverType, debug);
+//        	this.statistics("SELECT base_salary FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
         	
-        
+        	this.statistics("SELECT agency_start_date "
+        					+ " FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
+        	
+        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+					+ " FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
         }
         
         catch (Exception e) {
@@ -174,11 +182,12 @@ public class PerfTestingCassandra {
         SQLObj = new CDATACassandraDriver();
 		obj = new PerfTestingCassandra(driverType); 
 //		SQLObj.execCommand(Query);
-//		obj.PerformExp(driverType, debug);
+		obj.PerformExp(driverType, debug);
 //		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
 		
-		SQLObj.execCommand("DELETE FROM Cdata.test.nyc_payroll WHERE mid_init = 'L' ");
-		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
+//		obj.GenuineQuery("SELECT COUNT(*) FROM Cdata.test.nyc_payroll");
+//		SQLObj.execCommand("DELETE FROM Cdata.test.nyc_payroll WHERE mid_init = 'L' ");
+//		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
 //		obj.DBStats();
 		SQLObj.terminate();	
 //		
