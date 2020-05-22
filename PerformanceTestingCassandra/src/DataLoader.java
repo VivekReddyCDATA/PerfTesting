@@ -44,7 +44,7 @@ public class DataLoader {
 		PreparedStatement pstmt;
 		PayRoll[] payrollObjects = null;
 		
-		String Query =  "INSERT INTO Cdata.test.nyc_payroll (fiscal_year, payroll_number, agency_name, last_name, "
+		String Query =  "INSERT INTO test.nyc_payroll_progress_testing (fiscal_year, payroll_number, agency_name, last_name, "
 						+ "first_name,  mid_init, agency_start_date, work_location_borough, title_description, " 
 						+ " leave_status_as_of_july_31, base_salary, pay_basis, regular_hours, regular_gross_paid, "
 						+ "	ot_hours, total_ot_paid, total_other_pay, id)"
@@ -116,7 +116,7 @@ public class DataLoader {
 	
 	public static void main(String[] args) throws Exception
     {	
-		SQLObj = new CDATACassandraDriver();
+		SQLObj = new ProgressCassandraDriver();
 		DataLoader DL = new DataLoader("CData");
 		DL.DOMInsert("/home/vivekreddy/Desktop/Intern/nyc_payroll_900k.json");
 		SQLObj.terminate();	

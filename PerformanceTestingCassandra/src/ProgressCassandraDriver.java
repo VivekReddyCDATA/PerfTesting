@@ -1,10 +1,10 @@
 import java.sql.DriverManager;
 
-public class CDATACassandraDriver extends ConnectDB{
+public class ProgressCassandraDriver  extends ConnectDB {
 	
 	public void connect() {
 		try {
-	        Class.forName("cdata.jdbc.cassandra.CassandraDriver");
+	        Class.forName("com.ddtek.jdbc.cassandra.CassandraDriver");
 	    }
 	    catch (Exception exp) {
 	        System.out.println("Sorry!!! Unable to load Cassandra Driver");
@@ -12,12 +12,13 @@ public class CDATACassandraDriver extends ConnectDB{
 	    }
 	    
 	    try {
-	        conn = DriverManager.getConnection("jdbc:cassandra:server=localhost;port=9042;");
+	        conn = DriverManager.getConnection("jdbc:datadirect:cassandra://localhost:9042;");
 	        
 	        System.out.println("Connection Successful to Cassandra DB !!!!!!!!!!!!!!!!!!");
 	    }
 	    catch (Exception e) {
 	        e.printStackTrace();
 	    }
-	}	
+	}
+	
 }

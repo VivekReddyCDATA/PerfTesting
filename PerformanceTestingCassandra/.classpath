@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/PerfTesting/PerformanceTestingCassandra/lib/jackson-annotations-2.11.0.jar"/>
 	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/PerfTesting/PerformanceTestingCassandra/lib/jackson-core-2.11.0.jar"/>
 	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/PerfTesting/PerformanceTestingCassandra/lib/jackson-databind-2.11.0.jar"/>
+	<classpathentry kind="lib" path="/home/vivekreddy/Desktop/Intern/CassandraProgress/Progress/DataDirect/JDBC_60/lib/cassandra.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

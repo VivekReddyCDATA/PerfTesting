@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class PerfTestingCassandra {
 	
-	public int TestItr = 2;
+	public int TestItr = 1;
 	public static ConnectDB SQLObj;
 	
 	public PerfTestingCassandra(String driverType)
@@ -24,22 +24,27 @@ public class PerfTestingCassandra {
 		DatabaseMetaData table_meta = SQLObj.getMetaData();
 		String table[]={"TABLE"};  
 		ResultSet rs = table_meta.getTables(null, null, "%", null);  
-		String Query = "SELECT COUNT(*) as {2} FROM {0}.{1}.{2}";
+		String Query = "SELECT COUNT(*) as {2} FROM {1}.{2}";
 		ArrayList<String> tables =  new ArrayList<String>();
 		while(rs.next()){
 			String TC = rs.getString("TABLE_CAT");
 			String TS = rs.getString("TABLE_SCHEM");
 			String TN = rs.getString("TABLE_NAME");
-			try {
-				 GenuineQuery(MessageFormat.format(Query, TC, TS, TN));
-			}
-			catch (SQLException e) {
-				 System.out.println("Error: " + TC +"."+TS+"."+ TN);
-			}	  
-		System.out.println("Table Name: " + TC+"."+TS+"."+ TN);
+//			try {
+//				if (TN == "NodeIdInfo") continue;
+//				GenuineQuery(MessageFormat.format(Query, "Cdata", TS, TN));
+//			}
+//			catch (SQLException e) {
+//				 System.out.println("Error: " + TC +"."+TS+"."+ TN);
+// 				 e.printStackTrace();
+// 				 break;
+//			}	  
+		System.out.println("Table Name: " + TC +"."+TS+"."+ TN);
 		}
-
-		ResultSet rs_new = table_meta.getColumns("CData", "test", "nyc_payroll", null);
+		
+		this.GenuineQuery("SELECT COUNT(*) as nyc_payroll_progress_testing FROM test.nyc_payroll_progress_testing");
+		
+		ResultSet rs_new = table_meta.getColumns(null, "test", "nyc_payroll_progress_testing", null);
 	
 	    while (rs_new.next()) {
 	          System.out.println(rs_new.getString("COLUMN_NAME") + " "
@@ -128,28 +133,39 @@ public class PerfTestingCassandra {
         try {
         	
 //        	 To Not to Record outlier
-        	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM [Cdata].[test].[utmfileanalyze_details]");
+//        	this.trailRun("SELECT COUNT(*) as NumRowsFound FROM cdata.test.sampletable");
     
      	
         	// --------------------- Cdata.test.utmfileanalyze_details --------------------
         	
+        	TestItr = 3;
+        	
+//        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+//					+ " FROM test.nyc_payroll LIMIT 10000", driverType, debug);
+//        	
+//        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+//					+ " FROM test.nyc_payroll LIMIT 50000", driverType, debug);
+//        	
+//        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+//					+ " FROM test.nyc_payroll LIMIT 150000", driverType, debug);
+//        	
+//        	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
+//					+ " FROM test.nyc_payroll", driverType, debug);
+        	
+        	
+        	// CDATA Spec
         	
         	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
-					+ " FROM [Cdata].[test].[nyc_payroll] LIMIT 150000", driverType, debug);
+					+ " FROM Cdata.test.nyc_payroll LIMIT 10000", driverType, debug);
         	
         	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
-					+ " FROM [Cdata].[test].[nyc_payroll] LIMIT 50000", driverType, debug);
+					+ " FROM Cdata.test.nyc_payroll LIMIT 50000", driverType, debug);
         	
         	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
-					+ " FROM [Cdata].[test].[nyc_payroll] LIMIT 10000", driverType, debug);
-        	
-        	this.statistics("SELECT base_salary FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
-        	
-        	this.statistics("SELECT agency_start_date "
-        					+ " FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
+					+ " FROM Cdata.test.nyc_payroll LIMIT 150000", driverType, debug);
         	
         	this.statistics("SELECT id, last_name, title_description, regular_gross_paid, total_other_pay, work_location_borough"
-					+ " FROM [Cdata].[test].[nyc_payroll]", driverType, debug);
+					+ " FROM Cdata.test.nyc_payroll", driverType, debug);
         }
         
         catch (Exception e) {
@@ -165,35 +181,47 @@ public class PerfTestingCassandra {
 		boolean debug = false;
 		
 		System.out.println("\n ------------------ CDATA Section -----------------");
-		driverType = "Cassandra";
-        SQLObj = new CDATACassandraDriver();
-		obj = new PerfTestingCassandra(driverType); 
+//		driverType = "Cassandra";
+//      SQLObj = new CDATACassandraDriver();
+//		obj = new PerfTestingCassandra(driverType); 
 //		SQLObj.execCommand(Query);
-		obj.PerformExp(driverType, debug);
+//		obj.PerformExp(driverType, debug);
 //		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
 		
 //		obj.GenuineQuery("SELECT COUNT(*) FROM Cdata.test.nyc_payroll");
 //		SQLObj.execCommand("DELETE FROM Cdata.test.nyc_payroll WHERE mid_init = 'L' ");
 //		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
 //		obj.DBStats();
-		SQLObj.terminate();	
+//		SQLObj.terminate();	
 //		
 //		TimeUnit.SECONDS.sleep(20);
 //		
-//		System.out.println("\n ------------------ Progress Section -----------------");
-//        
-//      driverType = "Progress";
-//      SQLObj = new ProgressDriver();
-//		obj = new perfTest(driverType); 
+		System.out.println("\n ------------------ Progress Section -----------------");
+		
+        driverType = "Cassandra";
+        SQLObj = new ProgressCassandraDriver();
+		obj = new PerfTestingCassandra(driverType); 
+		
+		SQLObj.execCommand("REFRESH MAP");
 //		obj.PerformExp(driverType, debug);
-//		SQLObj.terminate();		
+//		SQLObj.execCommand(Query);
+//		obj.PerformExp(driverType, debug);
+//		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
+		
+//		obj.GenuineQuery("SELECT COUNT(*) FROM Cdata.test.nyc_payroll");
+//		SQLObj.execCommand("DELETE FROM Cdata.test.nyc_payroll WHERE mid_init = 'L' ");
+//		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
+		obj.DBStats();
+		SQLObj.terminate();	
+//		
+//		TimeUnit.SECONDS.sleep(20);
     }
 }
 
 
 
 /*
-obj.GenuineQuery("CREATE TABLE Cdata.test.nyc_payroll (id UUID PRIMARY KEY, \n" + 
+obj.GenuineQuery("CREATE TABLE test.nyc_payroll_progress (id UUID PRIMARY KEY, \n" + 
 		"							    fiscal_year int,\n" + 
 		"							    payroll_number int,\n" + 
 		"							    agency_name varchar,\n" + 
@@ -211,5 +239,24 @@ obj.GenuineQuery("CREATE TABLE Cdata.test.nyc_payroll (id UUID PRIMARY KEY, \n" 
 		"							    ot_hours double,\n" + 
 		"							    total_ot_paid double,\n" + 
 		"							    total_other_pay double)");
-*/
 
+
+SQLObj.execCommand("CREATE TABLE Cdata.test.nyc_payroll_progress (id UUID PRIMARY KEY," + 
+		"							    fiscal_year integer, " + 
+		"							    payroll_number integer, " + 
+		"							    agency_name varchar(2000), " + 
+		"							    last_name varchar(2000), " + 
+		"							    first_name varchar(2000)," + 
+		"							    mid_init varchar(2000), " + 
+		"							    agency_start_date timestamp, " + 
+		"                               work_location_borough varchar(2000), " + 
+		"							    title_description varchar(2000), " + 
+		"							    leave_status_as_of_july_31  varchar(2000), " + 
+		"							    base_salary  double, " + 
+		"							    pay_basis  varchar(2000)," + 
+		"							    regular_hours  double, " + 
+		"							    regular_gross_paid  double," + 
+		"							    ot_hours double, " + 
+		"							    total_ot_paid double, " + 
+		"							    total_other_pay double)");
+*/
