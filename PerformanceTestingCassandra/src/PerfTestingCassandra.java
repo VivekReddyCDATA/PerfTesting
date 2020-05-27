@@ -2,7 +2,6 @@ import java.sql.*;
 import java.io.*;
 import java.util.*; 
 import java.text.MessageFormat;
-import java.util.Random; 
 import java.util.concurrent.TimeUnit;
 
 public class PerfTestingCassandra {
@@ -181,82 +180,118 @@ public class PerfTestingCassandra {
 		boolean debug = false;
 		
 		System.out.println("\n ------------------ CDATA Section -----------------");
-//		driverType = "Cassandra";
-//      SQLObj = new CDATACassandraDriver();
-//		obj = new PerfTestingCassandra(driverType); 
+		driverType = "Cassandra";
+		SQLObj = new CDATACassandraDriver();
+		obj = new PerfTestingCassandra(driverType); 
 //		SQLObj.execCommand(Query);
 //		obj.PerformExp(driverType, debug);
-//		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
-		
-//		obj.GenuineQuery("SELECT COUNT(*) FROM Cdata.test.nyc_payroll");
+//		obj.GenuineQuery("SELECT * FROM test.keyspaces");
+		obj.GenuineQuery("SELECT * FROM CData.system_schema.keyspaces");
 //		SQLObj.execCommand("DELETE FROM Cdata.test.nyc_payroll WHERE mid_init = 'L' ");
 //		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
 //		obj.DBStats();
-//		SQLObj.terminate();	
-//		
-//		TimeUnit.SECONDS.sleep(20);
-//		
-		System.out.println("\n ------------------ Progress Section -----------------");
-		
-        driverType = "Cassandra";
-        SQLObj = new ProgressCassandraDriver();
-		obj = new PerfTestingCassandra(driverType); 
-		
-		SQLObj.execCommand("REFRESH MAP");
-//		obj.PerformExp(driverType, debug);
-//		SQLObj.execCommand(Query);
-//		obj.PerformExp(driverType, debug);
-//		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
-		
-//		obj.GenuineQuery("SELECT COUNT(*) FROM Cdata.test.nyc_payroll");
-//		SQLObj.execCommand("DELETE FROM Cdata.test.nyc_payroll WHERE mid_init = 'L' ");
-//		obj.GenuineQuery("SELECT id, first_name, last_name, mid_init FROM Cdata.test.nyc_payroll");
-		obj.DBStats();
 		SQLObj.terminate();	
-//		
+
 //		TimeUnit.SECONDS.sleep(20);
+		
+//		driverType = "Progress Cassandra";
+//		SQLObj = new ProgressAstraDriver("/home/vivekreddy/Desktop/Intern/secure-connect-testservers/");
+//		obj = new PerfTestingCassandra(driverType); 
+//		SQLObj.terminate();	
+		
     }
 }
 
+class CDATAAstraDriver extends ConnectDB{
+	
+	String rootpath;
+	
+	CDATAAstraDriver(String path){
+		rootpath = path;
+	}
+	
+	public void connect() {
+		
+		Properties connProps = new Properties();
+		
+		connProps.setProperty("Server", "54a50177-db08-41a7-8436-75e761079623-us-east1.db.astra.datastax.com");
+		connProps.setProperty("Port", "31364");
+		connProps.setProperty("Database", "cdata");
+		connProps.setProperty("User", "vivekk");
+		connProps.setProperty("Password", "!rssbus2020");
+		
+		connProps.setProperty("Use SSL", "true");
+		connProps.setProperty("SSL Server Cert", rootpath+"ca.crt");
+		connProps.setProperty("SSL Client Cert Type", "PEMKEY_FILE");
+		connProps.setProperty("SSL Client Cert", rootpath+"cert");
+		connProps.setProperty("SSL Client Cert Password", "1WMDb49EicZdJo82w");
+		
+		
+		try {
+	        Class.forName("cdata.jdbc.cassandra.CassandraDriver");
+	    }
+	    catch (Exception exp) {
+	        System.out.println("Sorry!!! Unable to load Cassandra Driver");
+	        exp.printStackTrace();
+	    }
+		
+		try {
+	        conn = DriverManager.getConnection("jdbc:cassandra:", connProps);
+	        
+	        System.out.println("Connection Successful to Cassandra DB !!!!!!!!!!!!!!!!!!");
+	    }
+	    catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+}
 
 
-/*
-obj.GenuineQuery("CREATE TABLE test.nyc_payroll_progress (id UUID PRIMARY KEY, \n" + 
-		"							    fiscal_year int,\n" + 
-		"							    payroll_number int,\n" + 
-		"							    agency_name varchar,\n" + 
-		"							    last_name varchar,\n" + 
-		"							    first_name varchar,\n" + 
-		"							    mid_init varchar,\n" + 
-		"							    agency_start_date timestamp,\n" + 
-		"                               work_location_borough varchar,\n" + 
-		"							    title_description varchar,\n" + 
-		"							    leave_status_as_of_july_31  varchar,\n" + 
-		"							    base_salary  double,\n" + 
-		"							    pay_basis    varchar,\n" + 
-		"							    regular_hours  double,\n" + 
-		"							    regular_gross_paid  double,\n" + 
-		"							    ot_hours double,\n" + 
-		"							    total_ot_paid double,\n" + 
-		"							    total_other_pay double)");
+class ProgressAstraDriver extends ConnectDB{
+	
+	String rootpath;
+	
+	ProgressAstraDriver(String path){
+		rootpath = path;
+	}
+	
+	public void connect() {
+		
+		Properties connProps = new Properties();
+		
+		connProps.setProperty("ValidateServerCertificate", "true");
+		connProps.setProperty("Encryption", "SSL");
+		connProps.setProperty("HostNameInCertificate", "54a50177-db08-41a7-8436-75e761079623-us-east1.db.astra.datastax.com");
+//		connProps.setProperty("PortNumber", "");
+		connProps.setProperty("KeyspaceName", "cdata");
+		connProps.setProperty("User", "vivekk");
+		connProps.setProperty("Password", "!rssbus2020");
+		connProps.setProperty("LoginTimeout", "50");
+		
+		connProps.setProperty("TrustStore", rootpath+"trustStore.jks");
+		connProps.setProperty("TrustStorePassword", "aInC913jf7yP0UBMA");
+		connProps.setProperty("KeyStore", rootpath+"identity.jks");
+		connProps.setProperty("KeyStorePassword", "WUVKy4jP8peM5S03i");
+		connProps.setProperty("KeyPassword", "1WMDb49EicZdJo82w");
+		
+		
+		try {
+	        Class.forName("cdata.jdbc.cassandra.CassandraDriver");
+	    }
+	    catch (Exception exp) {
+	        System.out.println("Sorry!!! Unable to load Cassandra Driver");
+	        exp.printStackTrace();
+	    }
+		
+		try {
+	        conn = DriverManager.getConnection("jdbc:datadirect:cassandra://54a50177-db08-41a7-8436-75e761079623-us-east1.db.astra.datastax.com:31364;", connProps);
+	        
+	        System.out.println("Connection Successful to Cassandra DB !!!!!!!!!!!!!!!!!!");
+	    }
+	    catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	}
+}
 
 
-SQLObj.execCommand("CREATE TABLE Cdata.test.nyc_payroll_progress (id UUID PRIMARY KEY," + 
-		"							    fiscal_year integer, " + 
-		"							    payroll_number integer, " + 
-		"							    agency_name varchar(2000), " + 
-		"							    last_name varchar(2000), " + 
-		"							    first_name varchar(2000)," + 
-		"							    mid_init varchar(2000), " + 
-		"							    agency_start_date timestamp, " + 
-		"                               work_location_borough varchar(2000), " + 
-		"							    title_description varchar(2000), " + 
-		"							    leave_status_as_of_july_31  varchar(2000), " + 
-		"							    base_salary  double, " + 
-		"							    pay_basis  varchar(2000)," + 
-		"							    regular_hours  double, " + 
-		"							    regular_gross_paid  double," + 
-		"							    ot_hours double, " + 
-		"							    total_ot_paid double, " + 
-		"							    total_other_pay double)");
-*/

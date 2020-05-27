@@ -10,6 +10,7 @@ abstract class ConnectDB {
     protected Statement stmt = null;
      
     abstract public void connect(); 
+//    abstract public void connectDataStax();
     
     protected String user = "support@nsoftware.com"; // "vivekk@cdata101.dev";
     protected String pwd = "!rssbus"; //!rssbus2020";

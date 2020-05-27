@@ -1,6 +1,8 @@
 import java.sql.DriverManager;
+import java.util.Properties;
 
 public class CDATACassandraDriver extends ConnectDB{
+
 	
 	public void connect() {
 		try {
@@ -19,5 +21,5 @@ public class CDATACassandraDriver extends ConnectDB{
 	    catch (Exception e) {
 	        e.printStackTrace();
 	    }
-	}	
+	}
 }
